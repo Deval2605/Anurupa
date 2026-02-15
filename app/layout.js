@@ -6,8 +6,8 @@ import { Providers } from "./Providers"; // Import the new provider
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Only Baddies",
-  description: "Find your vibe.",
+  title: "Anurupa | AI Personality & Aesthetic Engine",
+  description: "Find your aesthetic match.",
 };
 
 export default function RootLayout({ children }) {

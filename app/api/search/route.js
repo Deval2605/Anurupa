@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// We use relative paths (../../../) to ensure the system finds the files
 import connectDB from "../../../lib/db";
 import User from "../../../models/User";
 import { NextResponse } from "next/server";
@@ -11,32 +10,39 @@ export async function POST(req) {
     await connectDB();
     const { query } = await req.json();
 
-    // If search is empty, return recent users
     if (!query) {
-      const users = await User.find({}).limit(20);
-      return NextResponse.json({ users });
+        const users = await User.find().sort({ createdAt: -1 }).limit(20);
+        return NextResponse.json({ success: true, users });
     }
 
-    // AI Translation Layer: English -> MongoDB Query
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });    
-    const prompt = `You are a MongoDB query translator.
-    User Schema: { name: String, bio: String, location: String, isBaddie: Boolean }
+    // AI Translation: Natural Language -> MongoDB Query
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Translate this user search: "${query}" into a MongoDB find query JSON.
+    Fields available: 'name', 'location', 'aesthetic', 'vibe', 'fashionTags'.
+    Example: "Find minimalist in Chicago" -> { "location": { "$regex": "Chicago", "$options": "i" }, "aesthetic": "Minimalist" }
     
-    Translate: "${query}" into a MongoDB find query JSON.
-    Example: "Find baddies in NYC" -> { "location": { "$regex": "NYC", "$options": "i" }, "isBaddie": true }
-    
-    Return ONLY the JSON string.`;
+    Return JSON ONLY. Do not wrap in markdown.`;
 
     const result = await model.generateContent(prompt);
-    const mongoQueryString = result.response.text().replace(/```json|```/g, "").trim();
+    let mongoQuery = {};
     
-    const mongoQuery = JSON.parse(mongoQueryString);
+    try {
+        mongoQuery = JSON.parse(result.response.text().replace(/```json|```/g, "").trim());
+    } catch (e) {
+        // Fallback if AI fails: simple text search
+        mongoQuery = { 
+            $or: [
+                { name: { $regex: query, $options: 'i' } },
+                { aesthetic: { $regex: query, $options: 'i' } },
+                { location: { $regex: query, $options: 'i' } }
+            ]
+        };
+    }
 
     const users = await User.find(mongoQuery).limit(20);
-    return NextResponse.json({ users });
+    return NextResponse.json({ success: true, users });
 
   } catch (error) {
-    console.error("Search Error:", error);
     return NextResponse.json({ success: false, error: error.message });
   }
 }

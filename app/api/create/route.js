@@ -10,55 +10,43 @@ export async function POST(req) {
     await connectDB();
     const data = await req.json();
 
-    // --- 1. AGE CHECK (Server Side Security) ---
-    // We expect data.dob to be sent from the frontend
-    if (!data.dob) {
-        return NextResponse.json({ success: false, error: "Date of Birth is required." });
-    }
-
+    // 1. AGE CHECK (Keep the safety)
     const birthDate = new Date(data.dob);
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
+    if (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())) age--;
     
-    // Adjust age if birthday hasn't happened yet this year
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
+    if (age < 18) return NextResponse.json({ success: false, error: "Must be 18+ to join Anurupa." });
 
-    if (age < 18) {
-        return NextResponse.json({ success: false, error: "You must be 18+ to join Only Baddies." });
-    }
-
-    // --- 2. AI ANALYSIS (Real Human + Baddie Check) ---
+    // 2. ANURUPA AI ANALYSIS
     const cleanBase64 = data.imageBase64.split(',')[1];
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Or "gemini-2.0-flash" if available
     
-    // We use the specific model that works for you
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `Analyze this person for the 'Anurupa' personality engine.
+    1. STRICTLY Check: Is this a REAL HUMAN? (Reject cartoons/blurry/masks).
+    2. CLASSIFY the 'Aesthetic' into ONE of these categories: 
+       [Minimalist, Streetwear, Vintage, Corporate, Goth, Cottagecore, Athletic, Luxury, Bohemian, Casual].
+    3. IDENTIFY the 'Vibe' (1 word, e.g., Confident, Friendly, Edgy).
+    4. LIST 3-5 distinct 'Fashion Items' visible (e.g., "Leather Jacket", "Silver Chain").
     
-    const prompt = `Analyze this image for a dating app profile.
-    1. STRICTLY Check: Is this a photo of a REAL HUMAN person's face? (Reject cartoons, anime, landscapes, blurry objects, masks, or group photos).
-    2. If it is a Real Human: Does their style match the 'baddie' aesthetic (confident, stylish, trendy, photogenic)?
-    
-    Return ONLY a JSON object: 
-    { 
-        "isRealPerson": boolean, 
-        "isBaddie": boolean, 
-        "reason": "short explanation" 
+    Return JSON ONLY:
+    {
+        "isRealPerson": boolean,
+        "aesthetic": "CategoryString",
+        "vibe": "VibeString",
+        "fashionTags": ["tag1", "tag2", "tag3"],
+        "reason": "Short analysis of why"
     }`;
 
     const imagePart = { inlineData: { data: cleanBase64, mimeType: "image/jpeg" } };
-    
     const result = await model.generateContent([prompt, imagePart]);
-    const responseText = result.response.text();
-    const analysis = JSON.parse(responseText.replace(/```json|```/g, "").trim());
+    const analysis = JSON.parse(result.response.text().replace(/```json|```/g, "").trim());
 
     if (!analysis.isRealPerson) {
-        return NextResponse.json({ success: false, error: "AI Error: Please upload a clear photo of a real person." });
+        return NextResponse.json({ success: false, error: "Anurupa AI: Please upload a clear photo of a real person." });
     }
 
-    // --- 3. SAVE TO DATABASE ---
-    // We use findOneAndUpdate so if they upload again, it updates their profile instead of creating a duplicate.
+    // 3. SAVE
     const user = await User.findOneAndUpdate(
         { email: data.email }, 
         {
@@ -69,16 +57,17 @@ export async function POST(req) {
             email: data.email,
             dob: birthDate,
             age: age,
-            isBaddie: analysis.isBaddie,
-            aiReason: analysis.reason
+            // Save the new AI data
+            aesthetic: analysis.aesthetic,
+            vibe: analysis.vibe,
+            fashionTags: analysis.fashionTags
         },
-        { new: true, upsert: true } // Create if doesn't exist, Update if it does
+        { new: true, upsert: true }
     );
 
     return NextResponse.json({ success: true, user });
 
   } catch (error) {
-    console.error("Create Profile Error:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
