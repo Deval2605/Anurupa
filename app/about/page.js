@@ -19,11 +19,11 @@ export default function About() {
           </Link>
 
           <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent mb-4">
-            About Only Baddies
+            About Anurupa
           </h1>
 
           <p className="text-xl text-neutral-300 leading-relaxed">
-            Only Baddies is a modern full-stack platform built with Next.js and Tailwind CSS.
+            Anurupa is a modern full-stack platform built with Next.js and Tailwind CSS.
             It uses MongoDB Atlas for data storage and NextAuth.js for secure Google authentication.
             The app integrates Google’s Gemini API for real-time AI image verification, ensuring
             human authenticity and age compliance. Deployment is handled via Vercel with automated
