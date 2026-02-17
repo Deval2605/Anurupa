@@ -20,7 +20,7 @@ export async function POST(req) {
 
     // 2. ANURUPA AI ANALYSIS
     const cleanBase64 = data.imageBase64.split(',')[1];
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Or "gemini-2.0-flash" if available
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // Or "gemini-2.0-flash" if available
     
     const prompt = `Analyze this person for the 'Anurupa' personality engine.
     1. STRICTLY Check: Is this a REAL HUMAN? (Reject cartoons/blurry/masks).

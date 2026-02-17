@@ -16,7 +16,7 @@ export async function POST(req) {
     }
 
     // AI Translation: Natural Language -> MongoDB Query
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `Translate this user search: "${query}" into a MongoDB find query JSON.
     Fields available: 'name', 'location', 'aesthetic', 'vibe', 'fashionTags'.
     Example: "Find minimalist in Chicago" -> { "location": { "$regex": "Chicago", "$options": "i" }, "aesthetic": "Minimalist" }
