@@ -26,7 +26,7 @@ export default function About() {
             Anurupa is a modern full-stack platform built with Next.js and Tailwind CSS.
             It uses MongoDB Atlas for data storage and NextAuth.js for secure Google authentication.
             The app integrates Google’s Gemini API for real-time AI image verification, ensuring
-            human authenticity and age compliance. Deployment is handled via Vercel with automated
+            human authenticity and age compliance. The classification model helps you find your vibe. Deployment is handled via Vercel with automated
             CI/CD pipelines connected to GitHub for fast, global updates.
           </p>
         </div>
