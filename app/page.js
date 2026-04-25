@@ -76,42 +76,43 @@ export default function Home() {
   };
 
   // --- COMPONENTS ---
-  const AdsterraAd = () => {
+  const AdsterraAd = ({ adKey, width, height }) => {
     const bannerRef = useRef(null);
 
     useEffect(() => {
-      // This ensures the ad script is only injected once
-      if (bannerRef.current && !bannerRef.current.firstChild) {
+      // Clear out the div if it already has something so it doesn't duplicate
+      if (bannerRef.current) {
+        bannerRef.current.innerHTML = ''; 
         
-        // 1. Create the options script
         const conf = document.createElement("script");
         conf.type = "text/javascript";
         conf.innerHTML = `
           atOptions = {
-            'key' : 'e4dda032e79f7539856feb8111b17906',
+            'key' : '${adKey}',
             'format' : 'iframe',
-            'height' : 600,
-            'width' : 160,
+            'height' : ${height},
+            'width' : ${width},
             'params' : {}
           };
         `;
 
-        // 2. Create the invoke script
         const script = document.createElement("script");
         script.type = "text/javascript";
-        script.src = "https://www.highperformanceformat.com/e4dda032e79f7539856feb8111b17906/invoke.js";
+        script.src = `https://www.highperformanceformat.com/${adKey}/invoke.js`;
 
-        // 3. Inject them into the div
         bannerRef.current.append(conf);
         bannerRef.current.append(script);
       }
-    }, []);
+    }, [adKey, width, height]);
 
-    // The container matches your ad's exact dimensions (160x600)
     return (
-      <div className="flex justify-center my-6">
-        <div ref={bannerRef} className="w-[160px] h-[600px] bg-neutral-900 rounded-lg overflow-hidden flex items-center justify-center text-neutral-700 text-xs">
-          {/* Adsterra will inject the iframe right here */}
+      <div className="flex justify-center my-6 w-full">
+        {/* The container dynamically sizes itself to fit the ad perfectly */}
+        <div 
+            ref={bannerRef} 
+            className="flex items-center justify-center overflow-hidden"
+            style={{ width: `${width}px`, minHeight: `${height}px` }}
+        >
         </div>
       </div>
     );
