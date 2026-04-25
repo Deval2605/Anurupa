@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { Search, Sparkles, Camera, Shield, Trash2, LogOut, User as UserIcon, Infinity, MapPin, Tag, Menu } from "lucide-react";
@@ -76,12 +76,46 @@ export default function Home() {
   };
 
   // --- COMPONENTS ---
-  const AdComponent = ({ title }) => (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center h-48 flex flex-col items-center justify-center overflow-hidden my-4">
-        <span className="text-[10px] text-neutral-600 uppercase tracking-widest mb-2">Advertisement</span>
-        <div className="w-full h-full bg-neutral-800/50 rounded-lg flex items-center justify-center text-neutral-500 text-sm">{title}</div>
-    </div>
-  );
+  const AdsterraAd = () => {
+    const bannerRef = useRef(null);
+
+    useEffect(() => {
+      // This ensures the ad script is only injected once
+      if (bannerRef.current && !bannerRef.current.firstChild) {
+        
+        // 1. Create the options script
+        const conf = document.createElement("script");
+        conf.type = "text/javascript";
+        conf.innerHTML = `
+          atOptions = {
+            'key' : 'e4dda032e79f7539856feb8111b17906',
+            'format' : 'iframe',
+            'height' : 600,
+            'width' : 160,
+            'params' : {}
+          };
+        `;
+
+        // 2. Create the invoke script
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = "https://www.highperformanceformat.com/e4dda032e79f7539856feb8111b17906/invoke.js";
+
+        // 3. Inject them into the div
+        bannerRef.current.append(conf);
+        bannerRef.current.append(script);
+      }
+    }, []);
+
+    // The container matches your ad's exact dimensions (160x600)
+    return (
+      <div className="flex justify-center my-6">
+        <div ref={bannerRef} className="w-[160px] h-[600px] bg-neutral-900 rounded-lg overflow-hidden flex items-center justify-center text-neutral-700 text-xs">
+          {/* Adsterra will inject the iframe right here */}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-indigo-500 selection:text-white pb-24 md:pb-0">
@@ -171,7 +205,7 @@ export default function Home() {
                         <Search className="absolute left-3 top-3.5 text-neutral-600" size={16} />
                     </div>
                 </div>
-                <AdComponent title="Sponsor Ad" />
+                <AdsterraAd />
             </div>
         </div>
 
@@ -275,7 +309,7 @@ export default function Home() {
                     ))}
                     
                     {/* Mobile Feed Ad */}
-                    <div className="lg:hidden"><AdComponent title="Mobile Feed Ad" /></div>
+                    <div className="lg:hidden"><AdsterraAd /></div>
                 </div>
             )}
         </div>
@@ -283,13 +317,13 @@ export default function Home() {
         {/* RIGHT COLUMN */}
         <div className="hidden lg:block space-y-6">
             <div className="sticky top-24 space-y-6">
-                <AdComponent title="Google Ad #1" />
+                <AdsterraAd />
                 <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 text-center">
                     <h4 className="font-bold text-lg mb-2">Join Anurupa</h4>
                     <p className="text-neutral-500 text-sm mb-4">Discover your aesthetic match.</p>
                     <button onClick={() => setView("upload")} className="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-xl font-bold transition">Get Analyzed</button>
                 </div>
-                <AdComponent title="Google Ad #2" />
+                <AdsterraAd />
             </div>
         </div>
       </main>
