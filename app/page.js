@@ -304,7 +304,6 @@ export default function Home() {
                                     ))}
                                 </div>
                                 <p className="text-sm text-neutral-400 leading-relaxed">{u.bio}</p>
-                                <p className="text-[12px] text-neutral-300 mt-2">Joined {new Date(u.createdAt).toLocaleDateString(undefined, {month: "long", year: "numeric",})}</p>
                             </div>
                         </div>
                     ))}
