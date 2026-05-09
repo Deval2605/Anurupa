@@ -17,7 +17,7 @@
 
 
 ## 💡 What is it?
-Anurupa (Sanskrit for "suitable" or "corresponding") is a full-stack social matching platform. Instead of basic drop-down filters, users upload a photo, and our **Google Gemini 2.5 Flash Multimodal AI** scans their outfit, lighting, and posture to automatically classify their *Aesthetic* (e.g., Streetwear, Minimalist), extract their *Vibe*, and tag their fashion items. 
+Anurupa (Sanskrit for "suitable" or "corresponding") is a full-stack social matching platform. Instead of basic drop-down filters, users upload a photo, and  **Google Gemini 2.5 Flash Multimodal AI** scans their outfit, lighting, and posture to automatically classify their *Aesthetic* (e.g., Streetwear, Minimalist), extract their *Vibe*, and tag their fashion items. Its quiet simplified to say that. Theres a lot more involved.
 
 Want to find a "Minimalist in New York"? Just type it in the smart search. The AI translates human language into complex database queries on the fly. 
 
